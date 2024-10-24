@@ -1,7 +1,6 @@
 # grand-ball-auto
 
-Cara buat branch sendiri sendiri lihat aja dibawah ini: 
-
+### Cara buat branch sendiri sendiri lihat aja dibawah ini: 
 Create / switch to a new / existing branch
 
 If you're new to the project, create a new branch with the following command:
