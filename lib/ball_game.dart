@@ -58,12 +58,13 @@ class BallGame extends FlameGame {
     // Menggunakan data akselerometer untuk menggerakkan bola dengan sensitivitas tinggi
     ball.position.add(currentAcceleration * movementFactor);
 
-    // Menjaga bola agar tidak keluar dari batas layar
+    // Menjaga bola agar tidak keluar dari batas layar di semua sisi
     ball.position.clamp(
-      Vector2(0, 0),
-      Vector2(size.x - ball.size.x, size.y - ball.size.y),
+        Vector2(ball.size.x / 2, ball.size.y / 2), // Batas atas dan kiri
+        Vector2(size.x - ball.size.x / 2, size.y - ball.size.y / 2) // Batas kanan dan bawah
     );
   }
+
 
   @override
   void onRemove() {
