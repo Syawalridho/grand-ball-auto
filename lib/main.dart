@@ -25,7 +25,7 @@ class BallGameScreen extends StatefulWidget {
 class _BallGameScreenState extends State<BallGameScreen> {
   late BallGame _ballGame;
   bool isCalibrating = true;
-  String message = "Tentukan posisi terbaikmu, lalu ketuk layar untuk kalibrasi";
+  String message = "Tentukan posisi terkerenmu, lalu ketuk layar untuk kalibrasi";
   int countdown = 3;
 
   @override
