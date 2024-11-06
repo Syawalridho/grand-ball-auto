@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:light/light.dart';
-import 'package:screen_brightness/screen_brightness.dart';
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
@@ -8,6 +8,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,10 +27,9 @@ class LightSensorPage extends StatefulWidget {
 }
 
 class _LightSensorPageState extends State<LightSensorPage> {
-  Light? _light;
-  double _targetBrightness = 0.5;
-  String _luxValue = '0';
-  final ScreenBrightness _screenBrightness = ScreenBrightness(); // Buat instans
+  double _luxValue = 0.0; // Variabel untuk menyimpan intensitas cahaya
+  late Light _light;
+  late StreamSubscription _lightSubscription;
 
   @override
   void initState() {
@@ -39,59 +39,51 @@ class _LightSensorPageState extends State<LightSensorPage> {
   }
 
   void _startListening() {
-    _light?.lightSensorStream.listen((luxValue) {
+    _lightSubscription = _light.lightSensorStream.listen((luxValue) {
       setState(() {
-        _luxValue = luxValue.toString();
-        _updateTargetBrightness(double.parse(luxValue.toString()));
+        _luxValue = double.tryParse(luxValue.toString()) ??
+            0.0; // Mengonversi nilai lux ke double
       });
     });
   }
 
-  void _updateTargetBrightness(double luxValue) {
-    if (luxValue >= 80) {
-      _targetBrightness = 0.3;
-    } else if (luxValue >= 40) {
-      _targetBrightness = 0.5;
-    } else {
-      _targetBrightness = 0.8;
-    }
+  double _calculateOpacity(double luxValue) {
+    // Jika lux di bawah atau sama dengan 87, atur opacity proporsional (0 hingga 1)
+    // Jika di atas 87, opacity maksimal (1)
+    return (luxValue <= 87) ? (luxValue / 87).clamp(0.0, 1.0) : 1.0;
+  }
+
+  @override
+  void dispose() {
+    _lightSubscription.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Light Sensor App'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Intensity of Light (Lux): $_luxValue',
-              style: TextStyle(fontSize: 24),
+      body: Stack(
+        children: [
+          // Background hitam
+          Container(
+            color: Colors.black,
+          ),
+          // Overlay putih dengan opacity yang menyesuaikan intensitas cahaya
+          Opacity(
+            opacity: _calculateOpacity(_luxValue),
+            child: Container(
+              color: Colors.white,
             ),
-            SizedBox(height: 20),
-            TweenAnimationBuilder(
-              tween: Tween<double>(begin: 0.5, end: _targetBrightness),
-              duration: Duration(seconds: 1),
-              builder: (context, double brightness, _) {
-                _screenBrightness.setScreenBrightness(brightness); // Panggil melalui instans
-                return Text(
-                  'Screen Brightness: ${(brightness * 100).toStringAsFixed(0)}%',
-                  style: TextStyle(fontSize: 20),
-                );
-              },
+          ),
+          // Menampilkan informasi intensitas cahaya
+          Center(
+            child: Text(
+              'Intensity of Light (Lux): ${_luxValue.toStringAsFixed(2)}',
+              style: TextStyle(fontSize: 24, color: Colors.white),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _light = null;
-    super.dispose();
   }
 }
