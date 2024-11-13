@@ -3,11 +3,14 @@ import 'package:flame/game.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 import 'ball_component.dart';
+import 'light_sensor.dart';
 
 class BallGame extends FlameGame {
   late BallComponent ball;
   late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
+  late RectangleComponent background; // Komponen latar belakang
 
   final double movementFactor = 3.0;
   Vector2 currentAcceleration = Vector2.zero();
@@ -16,12 +19,20 @@ class BallGame extends FlameGame {
 
   final File? userPhoto;
   final bool startWithCalibration;
+  final LightSensor? lightSensor; // Tambahkan parameter lightSensor
 
-  BallGame({this.userPhoto, this.startWithCalibration = false});
+  BallGame({this.userPhoto, this.startWithCalibration = false, this.lightSensor});
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
+
+    // Inisialisasi komponen latar belakang
+    background = RectangleComponent(
+      size: Vector2(size.x, size.y),
+      paint: Paint()..color = Color(0xFFFFFFFF), // Mulai dengan warna putih
+    );
+    add(background);
 
     // Tambahkan komponen bola ke game, dengan foto pengguna jika tersedia
     ball = BallComponent(userPhoto: userPhoto)
@@ -31,6 +42,13 @@ class BallGame extends FlameGame {
     if (startWithCalibration) {
       startCalibration(); // Mulai kalibrasi otomatis jika diperlukan
     }
+
+    // Mulai mendengarkan perubahan intensitas cahaya jika sensor diaktifkan
+    lightSensor?.startListening((luxValue) {
+      // Ubah opasitas warna latar belakang secara bertahap
+      double opacity = lightSensor!.calculateOpacity();
+      background.paint.color = Color.fromRGBO(255, 255, 255, opacity); // Gradual dari putih ke hitam
+    });
   }
 
   void startCalibration() {
@@ -66,6 +84,7 @@ class BallGame extends FlameGame {
   @override
   void onRemove() {
     accelerometerSubscription.cancel();
+    lightSensor?.stopListening(); // Hentikan pendengaran sensor cahaya
     super.onRemove();
   }
 }
