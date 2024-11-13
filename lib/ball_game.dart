@@ -87,4 +87,4 @@ class BallGame extends FlameGame {
     lightSensor?.stopListening(); // Hentikan pendengaran sensor cahaya
     super.onRemove();
   }
-}
+} //tess pu8sh
