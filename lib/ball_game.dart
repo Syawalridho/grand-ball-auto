@@ -52,7 +52,7 @@ class BallGame extends FlameGame {
   }
 
   void startCalibration() {
-    print("Kalibrasi dimulai. Tetapkan posisi awal ponsel.");
+    print("Kalibrasi dimulai. Tetapkan posisi awIl ponsel.");
 
     accelerometerSubscription = accelerometerEvents.listen((AccelerometerEvent event) {
       if (!isCalibrated) {
