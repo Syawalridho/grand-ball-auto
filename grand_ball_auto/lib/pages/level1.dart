@@ -57,7 +57,21 @@ class _MazePuzzleState extends State<MazePuzzle> {
     1470, 1434, 1398, 1362, 1326, 1290, 1289, 1288, 1287, 1286, 1285, 1321, 1357, 1357, 1393, 1429, 1465, 1501, 1537, 1573, 1609, 1645,
     1646, 1647, 1648, 1649, 1650, 1651, 1652, 1653, 1653, 1654,
   ];
- 
+
+  List<int> start = [
+    1657, 1658, 1659, 1660,
+    1693, 1694, 1695, 1696,
+    1729, 1730, 1731, 1732,
+    1765, 1766, 1767, 1768,
+  ];
+
+  List<int> finish = [
+    412, 413, 414, 415,
+    448, 449, 450, 451,
+    484, 485, 486, 487,
+    520, 521, 522, 523,
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -67,22 +81,30 @@ class _MazePuzzleState extends State<MazePuzzle> {
         itemCount: numberOfSquares,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: numberInRow,
-          mainAxisSpacing: 0, // Remove vertical gap
-          crossAxisSpacing: 0, // Remove horizontal gap
-          childAspectRatio: 1.0, // Set the aspect ratio to 1:1
+          mainAxisSpacing: 0, 
+          crossAxisSpacing: 0,
+          childAspectRatio: 1.0,
         ),
         itemBuilder: (BuildContext context, int index) {
           if (barriers.contains(index)) {
             return Container(
               color: Colors.blue,
             );
+          } else if (start.contains(index)) {
+            return Container(
+              color: Colors.red,
+            );
+          } else if (finish.contains(index)) {
+            return Container(
+              color: Colors.green,
+            );
           } else {
             return Container(
-              color: Colors.grey,
+              color: Colors.white,
             );
           }
         },
-      ),
+      )
     );
   }
 }
@@ -97,6 +119,9 @@ class Level1Widget extends StatefulWidget {
 class _Level1WidgetState extends State<Level1Widget> {
   final StopWatchTimer _stopWatchTimer = StopWatchTimer();
   String _timerValue = "00:00";
+  bool _isMenuOpen = false;
+  double _volume = 50.0;
+
 
   @override
   void initState() {
@@ -114,6 +139,20 @@ class _Level1WidgetState extends State<Level1Widget> {
   void dispose() {
     _stopWatchTimer.dispose();
     super.dispose();
+  }
+
+  void _resetLevel() {
+    print('Level di-reset');
+    setState(() {
+      _isMenuOpen = false;
+    });
+    _stopWatchTimer.onResetTimer();
+    _stopWatchTimer.onStartTimer();
+  }
+
+  void _exitLevel() {
+    print('Keluar dari level');
+    Navigator.pop(context);
   }
 
   @override
@@ -147,7 +186,7 @@ class _Level1WidgetState extends State<Level1Widget> {
                   padding: const EdgeInsets.only(bottom: 35),
                   child: Text(
                     _timerValue,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Montserrat',
                       color: Colors.white,
                       fontSize: 53,
@@ -167,7 +206,7 @@ class _Level1WidgetState extends State<Level1Widget> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Text(
                         'LEVEL 1',
                         style: TextStyle(
@@ -187,7 +226,7 @@ class _Level1WidgetState extends State<Level1Widget> {
                   padding: const EdgeInsets.only(top: 130),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                    children: const [
                       Icon(Icons.star, color: Color.fromARGB(255, 109, 109, 109), size: 40),
                       SizedBox(width: 10),
                       Icon(Icons.star, color: Color.fromARGB(255, 109, 109, 109), size: 40),
@@ -197,12 +236,12 @@ class _Level1WidgetState extends State<Level1Widget> {
                   ),
                 ),
               ),
-              // Adjusted padding for the maze with specified top, bottom, left, and right paddings
               Padding(
                 padding: const EdgeInsets.only(
-                  top: 80,    // 120px top padding  // 70px bottom padding
-                  left: 40,    // 60px left padding
-                  right: 40,   // 60px right padding
+                  top: 80, // Padding atas untuk maze
+                  left: 40, // Padding kiri untuk maze
+                  right: 40, // Padding kanan untuk maze
+                  bottom: 40, // Padding bawah untuk maze (tambahkan padding bawah)
                 ),
                 child: MazePuzzle(),
               ),
@@ -211,13 +250,96 @@ class _Level1WidgetState extends State<Level1Widget> {
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: IconButton(
-                    icon: Icon(Icons.menu_rounded, color: Colors.white, size: 32),
+                    icon: Icon(
+                      _isMenuOpen ? Icons.close : Icons.menu_rounded, // Ikon berubah saat menu terbuka
+                      color: Colors.white,
+                      size: 32,
+                    ),
                     onPressed: () {
-                      print('Menu Icon Button pressed');
+                      setState(() {
+                        _isMenuOpen = !_isMenuOpen; // Toggle menu state
+                      });
                     },
                   ),
                 ),
               ),
+              if (_isMenuOpen)
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isMenuOpen = false; // Tutup menu saat area di luar menu ditekan
+                    });
+                  },
+                  child: Container(
+                    color: Colors.black.withOpacity(0.75),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Column(
+                            children: [
+                              Text(
+                                'Volume',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Slider(
+                                value: _volume,
+                                min: 0,
+                                max: 100,
+                                divisions: 100,
+                                label: '${_volume.round()}%',
+                                onChanged: (double value) {
+                                  setState(() {
+                                    _volume = value;
+                                  });
+                                },
+                                activeColor: Colors.white, // Warna slider yang aktif menjadi putih
+                                inactiveColor: Colors.white.withOpacity(0.5), // Warna slider yang tidak aktif menjadi putih transparan
+                              ),
+                              Text(
+                                '${_volume.round()}%',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: _resetLevel,
+                            child: Text(
+                              'Restart',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: _exitLevel,
+                            child: Text(
+                              'Exit',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                        ],
+
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -225,4 +347,3 @@ class _Level1WidgetState extends State<Level1Widget> {
     );
   }
 }
-

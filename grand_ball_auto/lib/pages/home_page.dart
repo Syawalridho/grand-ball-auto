@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'level_selection_page.dart'; // Import the Level Selection Page
+import 'level_selection_page.dart';
 
 class HomePageWidget extends StatefulWidget {
   const HomePageWidget({super.key});
@@ -20,13 +20,12 @@ class _HomePageWidgetState extends State<HomePageWidget> {
         body: SafeArea(
           child: Stack(
             children: [
-              // Gradient background
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
                       Color.fromRGBO(129, 226, 243, 1), // Top color
-                      Color.fromRGBO(40, 146, 165, 1), // Warna kedua (lebih gelap)
+                      Color.fromRGBO(40, 146, 165, 1), // Bottom color
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,

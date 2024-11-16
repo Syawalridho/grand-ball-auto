@@ -5,7 +5,7 @@ class LevelButton extends StatelessWidget {
   final Color color;
   final VoidCallback onPressed;
   final IconData? icon;
-  final double width; // New width parameter
+  final double width;
 
   const LevelButton({
     Key? key,
@@ -13,7 +13,7 @@ class LevelButton extends StatelessWidget {
     required this.color,
     required this.onPressed,
     this.icon,
-    required this.width, // Initialize width as required
+    required this.width,
   }) : super(key: key);
 
   @override
@@ -23,7 +23,7 @@ class LevelButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        minimumSize: Size(width, 82), // Use width here
+        minimumSize: Size(width, 82),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(13),
         ),

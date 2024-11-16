@@ -7,12 +7,11 @@ class LevelSelectionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen width
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent, // Transparent AppBar to blend with gradient
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -21,7 +20,7 @@ class LevelSelectionPage extends StatelessWidget {
           },
         ),
       ),
-      extendBodyBehindAppBar: true, // Ensures gradient background is behind the AppBar
+      extendBodyBehindAppBar: true,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -37,9 +36,7 @@ class LevelSelectionPage extends StatelessWidget {
           top: true,
           child: Stack(
             children: [
-              // Footer image at the bottom
               const FooterImage(),
-              // Centered content with level buttons
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -54,7 +51,7 @@ class LevelSelectionPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Level1Widget(), // Arahkan ke Level1Page
+                              builder: (context) => Level1Widget(),
                             ),
                           );
                         },
