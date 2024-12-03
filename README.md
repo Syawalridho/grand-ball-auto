@@ -1,16 +1,16 @@
-# grand-ball-auto
+# grand_ball_auto
 
-### Cara buat branch sendiri sendiri lihat aja dibawah ini: 
-Create / switch to a new / existing branch
+A new Flutter project.
 
-If you're new to the project, create a new branch with the following command:
+## Getting Started
 
-```bash
-git branch <branch-name>
-```
+This project is a starting point for a Flutter application.
 
-To switch to an existing branch, use the following command:
+A few resources to get you started if this is your first Flutter project:
 
-```bash
-git checkout <branch-name>
-```
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
