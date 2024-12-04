@@ -71,7 +71,7 @@ class BallGame extends FlameGame with HasCollisionDetection {
 
     // Tambahkan bola
     ball = BallComponent(userPhoto: userPhoto)
-      ..position = Vector2(size.x / 2, size.y / 2);
+      ..position = Vector2(size.x / 13, size.y / 26);
     add(ball);
 
     double blockSize = 30.0;
