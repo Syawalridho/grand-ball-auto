@@ -1,16 +1,45 @@
+import 'package:flutter/material.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:grand_ball_auto/game/wall_component.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
 import 'ball_component.dart';
 import 'light_sensor.dart';
 
-class BallGame extends FlameGame {
+class BallGame extends FlameGame with HasCollisionDetection {
   late BallComponent ball;
   late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
   late RectangleComponent background;
+  List<List<int>> walls_code = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 3, 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  ];
 
   double movementFactor = 3.0; // Sensitivitas pergerakan bola
   Vector2 currentAcceleration = Vector2.zero(); // Akselerasi saat ini
@@ -26,7 +55,8 @@ class BallGame extends FlameGame {
   final bool startWithCalibration;
   final LightSensor? lightSensor;
 
-  BallGame({this.userPhoto, this.startWithCalibration = false, this.lightSensor});
+  BallGame(
+      {this.userPhoto, this.startWithCalibration = false, this.lightSensor});
 
   @override
   Future<void> onLoad() async {
@@ -44,6 +74,21 @@ class BallGame extends FlameGame {
       ..position = Vector2(size.x / 2, size.y / 2);
     add(ball);
 
+    double blockSize = 30.0;
+
+    for (int i = 0; i < 26; i++) {
+      for (int j = 0; j < 13; j++) {
+        if (walls_code[i][j] == 1) {
+          add(RectangleCollidable(Vector2(j * blockSize, i * blockSize)));
+        } else if (walls_code[i][j] == 3) {
+          ball.position = Vector2(j * blockSize, i * blockSize);
+          add(Start(Vector2(j * blockSize, i * blockSize)));
+        } else if (walls_code[i][j] == 4) {
+          add(Finish(Vector2(j * blockSize, i * blockSize)));
+        }
+      }
+    }
+
     if (startWithCalibration) {
       startCalibration();
     }
@@ -58,7 +103,8 @@ class BallGame extends FlameGame {
   void startCalibration() {
     print("Kalibrasi dimulai. Tetapkan posisi awal ponsel.");
 
-    accelerometerSubscription = accelerometerEvents.listen((AccelerometerEvent event) {
+    accelerometerSubscription =
+        accelerometerEvents.listen((AccelerometerEvent event) {
       if (!isCalibrated) {
         initialOffset = Vector2(event.x, event.y);
         isCalibrated = true;
@@ -77,25 +123,10 @@ class BallGame extends FlameGame {
     super.update(dt);
 
     if (isCalibrated) {
-      // Perbarui kecepatan berdasarkan percepatan dan massa bola
       Vector2 accelerationWithMass = currentAcceleration / ballMass;
-      velocity += accelerationWithMass * movementFactor * dt;
-
-      // Terapkan gesekan
-      velocity *= friction;
-
-      // Perbarui posisi bola
-      ball.position += velocity;
-
-      // Pantulkan jika bola menyentuh tepi layar
-      if (ball.position.x <= ball.size.x / 2 || ball.position.x >= size.x - ball.size.x / 2) {
-        velocity.x = -velocity.x * 0.8; // Pantulan dengan pengurangan energi
-        ball.position.x = ball.position.x.clamp(ball.size.x / 2, size.x - ball.size.x / 2);
-      }
-      if (ball.position.y <= ball.size.y / 2 || ball.position.y >= size.y - ball.size.y / 2) {
-        velocity.y = -velocity.y * 0.8; // Pantulan dengan pengurangan energi
-        ball.position.y = ball.position.y.clamp(ball.size.y / 2, size.y - ball.size.y / 2);
-      }
+      ball.velocity += accelerationWithMass * movementFactor * dt;
+      ball.velocity *= friction;
+      ball.move();
     }
   }
 
