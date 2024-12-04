@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../assets/LevelButton.dart';
 import 'level1.dart';
+import '../game/game_screen.dart';
 
 class LevelSelectionPage extends StatelessWidget {
   const LevelSelectionPage({Key? key}) : super(key: key);
@@ -51,7 +52,7 @@ class LevelSelectionPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Level1Widget(),
+                              builder: (context) => MainGameScreen(),
                             ),
                           );
                         },
