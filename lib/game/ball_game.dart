@@ -71,18 +71,23 @@ class BallGame extends FlameGame with HasCollisionDetection {
 
     // Tambahkan bola
     ball = BallComponent(userPhoto: userPhoto)
-      ..position = Vector2(size.x / 13, size.y / 26);
+      ..position = Vector2(size.x / 2, size.y / 2);
     add(ball);
 
-    double blockSize = 30.0;
+    double blockSizeX = size.x / 12; // Menyesuaikan ukuran blok dengan lebar layar dan jumlah kolom (13)
+    double blockSizeY = size.y / 24; // Menyesuaikan ukuran blok dengan tinggi layar dan jumlah baris (26)
+
+    // Gunakan ukuran terkecil dari lebar dan tinggi
+    double blockSize = blockSizeX < blockSizeY ? blockSizeX : blockSizeY;
 
     for (int i = 0; i < 26; i++) {
       for (int j = 0; j < 13; j++) {
         if (walls_code[i][j] == 1) {
           add(RectangleCollidable(Vector2(j * blockSize, i * blockSize)));
         } else if (walls_code[i][j] == 3) {
-          ball.position = Vector2(j * blockSize, i * blockSize);
-          add(Start(Vector2(j * blockSize, i * blockSize)));
+          final startPosition = Vector2(j * blockSize, i * blockSize);
+          ball.position = startPosition; // Set the ball position to the start
+          add(Start(startPosition));
         } else if (walls_code[i][j] == 4) {
           add(Finish(Vector2(j * blockSize, i * blockSize)));
         }
@@ -95,10 +100,25 @@ class BallGame extends FlameGame with HasCollisionDetection {
 
     // Mulai mendengarkan sensor cahaya
     lightSensor?.startListening((luxValue) {
-      double opacity = lightSensor!.calculateOpacity();
-      background.paint.color = Color.fromRGBO(255, 255, 255, opacity);
+      double opacity = calculateOpacityFromLux(luxValue);
+      // Set warna latar belakang berdasarkan nilai lux
+      background.paint.color = Color.fromRGBO(255, 255, 255, opacity); // Mengubah opacity background
     });
   }
+
+  double calculateOpacityFromLux(double luxValue) {
+    // Asumsikan nilai lux berada pada kisaran yang umum. Sesuaikan dengan kebutuhan.
+    double minLux = 0;    // Nilai lux minimum (gelap)
+    double maxLux = 200; // Nilai lux maksimum (terang)
+
+    // Normalisasi nilai lux menjadi antara 0 dan 1
+    double normalizedLux = (luxValue - minLux) / (maxLux - minLux);
+    normalizedLux = normalizedLux.clamp(0.0, 1.0); // Pastikan nilainya antara 0 dan 1
+
+    // Konversi nilai lux menjadi opacity (0 = hitam, 1 = putih)
+    return 1.0 - normalizedLux; // Jika cahaya terang (lux tinggi), opacity lebih dekat ke 0 (putih)
+  }
+
 
   void startCalibration() {
     print("Kalibrasi dimulai. Tetapkan posisi awal ponsel.");
