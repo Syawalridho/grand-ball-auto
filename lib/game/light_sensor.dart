@@ -29,7 +29,7 @@ class LightSensor {
 
   double calculateOpacity() {
     // Ambil batas maksimum intensitas cahaya untuk opacity penuh (misalnya 200)
-    double maxLux = 200.0;
+    double maxLux = 200;
     // Hasilkan nilai opacity yang halus, dari 0.0 hingga 1.0, berdasarkan nilai lux
     return (luxValue / maxLux).clamp(0.0, 1.0);
   }
