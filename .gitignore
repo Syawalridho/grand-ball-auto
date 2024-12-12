@@ -2,5 +2,5 @@
 .idea
 build
 
-# Ignore Gradle project-specific cache directory
+# Ignore Gradle project-specific cache direct
 .gradle
