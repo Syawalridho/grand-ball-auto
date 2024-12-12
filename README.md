@@ -2,6 +2,8 @@
 
 A new Flutter project.
 
+*Mohon maaf bila ada message yang kurang enak dilihat karena ada seseorang yang marah marah baru ngerjain H-1
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
